@@ -1,5 +1,5 @@
 ---
-title: Introduktion
+title: Forside
 nav_order: 1
 layout: default
 ---
