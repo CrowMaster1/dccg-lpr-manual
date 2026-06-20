@@ -51,7 +51,7 @@ Patienter med ukendt primær cancer, hvor MDT beslutter at behandle som kolorekt
 
 DCCG's database opsamler viden omkring hele patientens forløb. Der defineres datapunkter -- primært omkring diagnosetidspunktet, ved resektioner/endoskopiske procedure, onkologisk behandling samt kontrol da disse har kvalitetsmæssig fokus. Nedenstående figur viser forskellige forløb som en kolorektalcancerpatient kan have samt de datapunkter hvor DCCG opsamler data.
 
-![](/assets/images/patientforloeb.png)
+![Patientforløb](assets/images/patientforloeb.png)
 
 ## Mangellister & Data-mangellister
 
