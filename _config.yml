@@ -1,0 +1,27 @@
+title: DCCG-LPR Databasemanual
+description: Databasemanual for DCCG-LPR
+lang: da
+
+theme: just-the-docs
+
+url: ""
+
+# Nav
+nav_sort: order
+
+# Footer
+footer_content: "DCCG-LPR Databasemanual"
+
+# Search
+search_enabled: true
+search_tokenizer_separator: /[\s\-/]+/
+
+# Heading anchors
+heading_anchors: true
+
+# Aux links (top right)
+# aux_links:
+#   "GitHub": "https://github.com/your-org/your-repo"
+
+plugins:
+  - jekyll-seo-tag
