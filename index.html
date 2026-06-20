@@ -1,0 +1,3183 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCCG-LPR Databasemanual</title>
+<style>
+:root {
+  --w: 285px;
+  --top: 52px;
+  --blue: #005b99;
+  --blue-light: #e8f0f8;
+  --bg: #f7f8fa;
+  --border: #dde2e8;
+  --text: #1c2333;
+  --muted: #4a5568;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font: 16px/1.75 system-ui, -apple-system, sans-serif; color: var(--text); background: #fff; }
+
+/* ── Top bar (mobile) ── */
+#topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: var(--top);
+  background: var(--blue); color: #fff;
+  align-items: center; gap: 0.8rem; padding: 0 1rem;
+  z-index: 200; font-weight: 600; font-size: 0.95rem;
+}
+#hbtn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 2px 6px; }
+
+/* ── Sidebar ── */
+#sidebar {
+  position: fixed; top: 0; left: 0;
+  width: var(--w); height: 100vh;
+  background: var(--bg); border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  z-index: 150;
+}
+#sb-head {
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--blue); color: #fff;
+  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.02em;
+}
+#sbclose { display: none; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+#sb-nav { overflow-y: auto; flex: 1; padding: 0.4rem 0; }
+
+/* ── Nav items ── */
+.nc { border-bottom: 1px solid var(--border); }
+.nt {
+  display: block; padding: 0.65rem 1.2rem;
+  font-size: 0.83rem; font-weight: 600; color: var(--text);
+  text-decoration: none; transition: background 0.15s, color 0.15s;
+  border-left: 3px solid transparent;
+}
+.nt:hover { background: var(--blue-light); color: var(--blue); }
+.nt.active { color: var(--blue); border-left-color: var(--blue); background: var(--blue-light); }
+.nsub { display: none; background: #fff; }
+.nc.open .nsub { display: block; }
+.ns {
+  display: block; padding: 0.4rem 1.2rem 0.4rem 2rem;
+  font-size: 0.78rem; color: var(--muted);
+  text-decoration: none; transition: background 0.15s, color 0.15s;
+}
+.ns:hover { background: var(--blue-light); color: var(--blue); }
+.ns.active { color: var(--blue); font-weight: 500; }
+
+/* ── Main content ── */
+#main { margin-left: var(--w); padding: 2.5rem 4rem; }
+section { max-width: 820px; padding-bottom: 3rem; margin-bottom: 3rem; border-bottom: 2px solid var(--border); }
+section:last-child { border-bottom: none; }
+
+/* ── Typography ── */
+h1 {
+  font-size: 1.75rem; font-weight: 700; color: var(--blue);
+  padding-bottom: 0.6rem; border-bottom: 2px solid var(--blue);
+  margin-bottom: 1.5rem;
+}
+h2 {
+  font-size: 1.2rem; font-weight: 700;
+  margin: 2.2rem 0 0.7rem;
+  padding-bottom: 0.35rem; border-bottom: 1px solid var(--border);
+}
+h3 { font-size: 1.05rem; font-weight: 600; margin: 1.6rem 0 0.5rem; color: #2d3748; }
+h4 { font-size: 0.95rem; font-weight: 600; margin: 1.2rem 0 0.4rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+p { margin-bottom: 0.85rem; }
+ul, ol { margin: 0.4rem 0 0.85rem 1.6rem; }
+li { margin-bottom: 0.25rem; }
+a { color: var(--blue); }
+strong, b { font-weight: 600; }
+
+/* ── Tables ── */
+table { border-collapse: collapse; width: 100%; margin: 1.2rem 0; font-size: 0.875rem; }
+th {
+  background: var(--blue); color: #fff;
+  padding: 0.55rem 0.9rem; text-align: left; font-weight: 600;
+  white-space: nowrap;
+}
+td { padding: 0.5rem 0.9rem; border: 1px solid var(--border); vertical-align: top; }
+tr:nth-child(even) td { background: #f2f6fb; }
+tr:hover td { background: #e4eef8; }
+table p { margin: 0; }
+
+/* ── Images ── */
+img { max-width: 100%; height: auto; display: block; margin: 1.2rem 0; border: 1px solid var(--border); border-radius: 4px; }
+
+/* ── Mobile ── */
+@media (max-width: 860px) {
+  #topbar { display: flex; }
+  #sidebar { transform: translateX(-100%); transition: transform 0.25s ease; top: 0; }
+  #sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+  #sbclose { display: block; }
+  #overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 140; }
+  #overlay.show { display: block; }
+  #main { margin-left: 0; padding: 1.5rem 1.2rem; margin-top: var(--top); }
+  section { max-width: 100%; }
+  table { font-size: 0.8rem; display: block; overflow-x: auto; }
+  h1 { font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <button id="hbtn" aria-label="Menu">&#9776;</button>
+  <span>DCCG-LPR Databasemanual</span>
+</header>
+
+<div id="overlay"></div>
+
+<nav id="sidebar">
+  <div id="sb-head">
+    <span>DCCG&#8209;LPR Manual</span>
+    <button id="sbclose" aria-label="Luk">&#10005;</button>
+  </div>
+  <div id="sb-nav">
+<div class="nc"><a href="#forside-sec" class="nt">Forside</a></div>
+<div class="nc"><a href="#dataindsamling-sec" class="nt">Dataindsamling</a></div>
+<div class="nc"><a href="#basisinformationer-sec" class="nt">Basisinformationer</a></div>
+<div class="nc"><a href="#patient-oplysninger-sec" class="nt">Patient oplysninger</a></div>
+<div class="nc"><a href="#rektum-cancer-specifikke-koder-sec" class="nt">Rektum Cancer – Specifikke koder</a></div>
+<div class="nc"><a href="#hjaelpesektion-basisinformationer-sec" class="nt">Hjælpesektion – Basisinformationer</a></div>
+<div class="nc"><a href="#kirurgiske-procedurer-sec" class="nt">Kirurgiske Procedurer</a></div>
+<div class="nc"><a href="#dccg-procedure-endoskopi-sec" class="nt">DCCG-procedure & Endoskopi</a></div>
+<div class="nc"><a href="#komplikationsregistrering-sec" class="nt">Komplikationsregistrering</a></div>
+<div class="nc"><a href="#hjaelpesektion-komplikationer-sec" class="nt">Hjælpesektion – Komplikationer</a></div>
+<div class="nc"><a href="#medicinske-komplikationer-sec" class="nt">Medicinske komplikationer</a></div>
+<div class="nc"><a href="#kontrol-recidiv-sec" class="nt">Kontrol & Recidiv</a></div>
+<div class="nc"><a href="#onkologi-sec" class="nt">Onkologi</a></div>
+  </div>
+</nav>
+
+<main id="main">
+<section id="forside-sec">
+<h1 id="dccg-lpr-databasemanual">DCCG-LPR Databasemanual</h1>
+<p>Dette er databasemanualen for DCCG-LPR (Dansk Colorectal Cancer
+Gruppe – Landspatientregisteret).</p>
+<p>Brug navigationen til venstre for at browse manualens afsnit.</p>
+
+</section>
+<section id="dataindsamling-sec">
+<h1 id="dataindsamling">Dataindsamling</h1>
+<p>DCCG’s database dannes af kodning via indberetninger til LPR samt
+PATOBANK.</p>
+<p>Det kliniske personale anvender kodning i forbindelse med behandling
+af patienten, der opsamles og struktureres. Databasens population dannes
+ud fra registreringer i LPR og suppleres med oplysninger fra
+Patobank</p>
+<h2 id="population">Population</h2>
+<p>Databasens patientpopulation er afgrænset ved følgende:</p>
+<p>Patienter med førstegangstilfælde og recidiv af cancer i kolon eller
+rektum, givet ved ICD-10 diagnosekoderne, C180-189 og C209.</p>
+<p>Patienter der er 18 år eller ældre på diagnosetidspunktet.</p>
+<p>Patienter der har bopæl i Danmark og gyldigt dansk cpr-nummer.</p>
+<p>Der er registreret et forløb på en kirurgisk afdeling, eller
+patienten er behandlet af en kirurgisk afdeling under indlæggelse på
+anden afdeling på et offentligt sygehus.</p>
+<p>Patienter opdeles baseret på histologisk subtype, eller manglende
+histologi.</p>
+<p>Patienter med følgende histologiske subtyper opgøres samlet</p>
+<p>Histologiske tumortyper:</p>
+<ul>
+<li>Adenokarcinom</li>
+<li>Lavt differentieret adenokarcinom</li>
+<li>Mucinøst adenokarcinom</li>
+<li>Signetringscelle karcinom</li>
+<li>Udifferentieret karcinom</li>
+<li>Medullært karcinom</li>
+</ul>
+<p>Patienter der er klinisk diagnosticeret uden histologisk
+verifikation, eller har anden histologi end ovenfor opgøres i
+simplificeret form.</p>
+<p>Patienter med kræft i blindtarm (DC18.1) opgøres separat i
+simplificeret form. Der er ikke krav om indberetning af
+basisinformationer eller andre variabler til DCCG-databasen for
+patienter med kræft i blindtarmen. Der er heller ikke krav til
+DCCG-patologi beskrivelse for disse.</p>
+<h3 id="eksklusionskriterier">Eksklusionskriterier</h3>
+<p>For patienter, hvor DC18.0-9 eller 20.9 er angivet i LPR med
+kræftpakkeforløbskoden, AFB12X1 (kræft i tyk- og endetarm: pakkeforløb
+slut, diagnose afkræftet), eller diagnosetillægskoden, ZDW73 (diagnosen
+senere afkræftet), ekskluderes. – Se afsnit senere omkring fjernelse af
+patienter fra LPR.</p>
+<h2 id="behandling-uden-primær-tumor">Behandling uden primær tumor</h2>
+<p>Patienter med ukendt primær cancer, hvor MDT beslutter at behandle
+som kolorektalcancer, indgår ikke i databasen, og skal ikke kodes med
+DC18.0 -&gt; 18.9 eller 20.9. Disse kodes med diagnosekoden DC80.9
+(kræft uden kendt primær). </p>
+<h2
+id="patientforløbsregistreringdata-punkter">Patientforløbsregistrering/Data
+punkter</h2>
+<p>DCCG’s database opsamler viden omkring hele patientens forløb. Der
+defineres datapunkter – primært omkring diagnosetidspunktet, ved
+resektioner/endoskopiske procedure, onkologisk behandling samt kontrol
+da disse har kvalitetsmæssig fokus. Nedenstående figur viser forskellige
+forløb som en kolorektalcancerpatient kan have samt de datapunkter hvor
+DCCG opsamler data.</p>
+<p><img src="/assets/images/patientforloeb.png" /></p>
+<h2 id="mangellister-data-mangellister">Mangellister &amp;
+Data-mangellister</h2>
+<h3 id="mangellister">Mangellister</h3>
+<p>Der dannes kun mangellister genereret fra patienter, der findes i
+patobank med kolorektal patologi, hvor der ikke er indberettet
+cancerdiagnose i LPR</p>
+<h3 id="data-mangellister">Data mangellister</h3>
+<p>For at sikre høj dækningsgrad af databasen produceres
+data-mangellister. Disse datamangel lister gøres tilgængelige for den
+indrapporterende afdeling. På sigt oprettes som supplerende indikatorer,
+således at det er muligt at få hurtig tilbagemelding på ikke komplette
+data.</p>
+<p>Listerne baseres på om patienten i forbindelse med en DCCG-procedure
+har fået tilknyttet en behandlingsintentionskode/proceduresigte. Såfremt
+behandlingsintention er tilknyttet, tolkes resterende ikke-registrerede
+felter, hvor “ukendt” ikke er en mulighed, som verificeret ukendt. Ved
+manglende behandlingsintention tolkes samtlige ikke-registrerede
+variabler som “ikke udfyldt”.</p>
+<h2 id="registrering-ved-multiple-værdier">Registrering ved multiple
+værdier</h2>
+<p>Hvis der i LPR optræder flere værdier af en variabel, vil databasen
+som udgangspunkt opfatte den værdi, der ligger tættest på proceduren,
+som den behandlingsbestemmende og inkludere denne. Data vil forsat være
+tilgængelige via LPR såfremt, man senere vil anvende disse til at
+beskrive detaljer i et patientforløb.</p>
+<h2
+id="fjernelse-af-patienter-fra-databasen-fejlagtig-indberetning-i-lpr">Fjernelse
+af patienter fra databasen – fejlagtig indberetning i LPR</h2>
+<h3 id="vestdanmark-systematic-epj">Vestdanmark (Systematic EPJ)</h3>
+<p>Der vælges diagnosen i diagnosebilledet, der vælges herefter kontekst
+menu (Højre klik) og der vælges “Senere afkræftet”</p>
+<h3 id="østdanmark-sundhedsplatformen">Østdanmark
+(Sundhedsplatformen)</h3>
+<p>Der tilknyttes ”`ZDW73” til diagnosen I diagnoseoverblikket.</p>
+<h2 id="synkrone-og-metakrone-cancer">Synkrone og Metakrone cancer</h2>
+<p>Databasen understøtter synkrone og metakrone cancere.</p>
+<p>Synkrone cancere registres som beskrevet under
+basisinformationer.</p>
+<p>Med synkrone menes en tumor der behandles på samme sygdomsforløb, og
+hvor behandlingsstrategien er samlet for disse.</p>
+<p>For metakrone cancere oprettes nyt sygdomsforløb og canceren
+behandles som “ny” med fuld registrering.</p>
+<p>Ved ny tumor i samme segment, som f.eks. segment hvor der tidligere
+er foretaget polypektomi, besluttes lokalt om det drejer sig om recidiv
+(samme forløb + recidiv kode) eller ny cancer (nyt forløb).</p>
+<p>Se sektion omkring recidiv for registrering. </p>
+<h2 id="helbredsforløb">Helbredsforløb</h2>
+<p>Alle behandlinger tilknyttes patientens helbredsforløb. Disse består
+af alle kontakter under cancerdiagnosekoden på samtlige afdelinger.
+Forløbet er ikke tilknyttet en enkelt afdeling men den samlede diagnose.
+Når patienten ophører med behandling og/eller kontrol er det vigtigt at
+dette forløb afsluttes. Databasen vil herefter opfatte nye forløb som en
+ny cancer, såfremt det ikke fremgår af kodning at der er tale om recidiv
+(se senere).</p>
+<p>Patienter der ikke modtager behandling eller ikke følges, med
+kontroller bør have deres forløb afsluttet. Patienter med åbne forløb
+uden evt. Kontrol skanninger vil fremgå som manglende hvis forløb ikke
+er afsluttet. Hvis forløb er afsluttet vil evt. Kontrol skanninger
+foretaget på andet forløb ikke opfattes som relateret til patientens
+kolorektalcancerforløb.</p>
+<h2 id="dataansvar">Dataansvar</h2>
+<p>Ansvaret for udfyldelse af basisinformationer påhviler den udredende
+afdeling. For patienter, der ikke har fået foretaget regelret udredning,
+tildeles ansvaret patientens lokale kolorektal-kirurgiske afdeling.</p>
+
+</section>
+<section id="basisinformationer-sec">
+<h1 id="basisinformationer">Basisinformationer</h1>
+<p>Disse koder indsamles i forbindelse med initial diagnostik af en
+kolorektalcancerpatient. Følger normal resultatindberetning for cancer
+diagnoser (indberetning til cancerregisteret).</p>
+<h3 id="cancer-anmeldelse-tnm">Cancer Anmeldelse (TNM)</h3>
+<p>stadieindberetningen følger kravene til indberetning til
+cancerregisteret*.</p>
+<p>Databasen anvender både cTNM og pTNM. pTNM opsamles fra PATOBANK.</p>
+<p>Vær opmærksom på at DCCG-databasen anvender subgrupper af cT stadiet
+mhp. at undgå dobbelt registrering (se afsnit for dette)</p>
+<h4 id="lokalisationskode">Lokalisationskode</h4>
+<p>Tumor lokalisation kodes efter bedste endoskopiske og/eller
+billeddiagnostiske skøn.</p>
+<p>Uspecifik lokalisation (DC18.9) bør ikke anvendes, da databasen
+dermed mister muligheden for at skelne mellem flere synkrone eller
+metakrone cancere. Optræder denne i sammenhæng med mere specifik
+kodning, vil specifik kodning have højere prioritet.</p>
+<p>Databasen vil som udgangspunkt anvende den DC kode der er anvendt til
+stadieinddeling.</p>
+<p>DC18.9 må gerne anvendes i henvisninger etc, da databasen ikke
+indsamler dette. Denne nomenklatur er at foretrække end en “forkert”
+anatomisk kodning.</p>
+<h4 id="synkrone-tumorer">Synkrone tumorer</h4>
+<p>Ved synkrone tumorer kodes alle lokalisationer. Befinder der sig
+flere tumorer i samme segment, kodes disse som én lokalisation og data
+indhentes fra Patobank.</p>
+<p>Ved evt. senere behandling/recidiv anvendes den lokalisation, der
+vurderes som udløsende for behandling.</p>
+<table>
+<colgroup>
+<col style="width: 101%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:98%;">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 19%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Diagnose [P]</strong></th>
+<th style="text-align: center;"><strong>ICD-10 kode</strong></th>
+<th style="text-align: center;"><strong> Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Kræft i caecum</td>
+<td style="text-align: center;">DC180</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i blindtarmen</td>
+<td style="text-align: center;">DC181</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i colon ascendens</td>
+<td style="text-align: center;">DC182</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i flexura coli dextra</td>
+<td style="text-align: center;">DC183</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i colon transversum</td>
+<td style="text-align: center;">DC184</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i flexura coli sinistra</td>
+<td style="text-align: center;">DC185</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i colon descendens</td>
+<td style="text-align: center;">DC186</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i colon sigmoideum</td>
+<td style="text-align: center;">DC187</td>
+<td style="text-align: center;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i tyktarmen UNS</td>
+<td style="text-align: center;">DC189</td>
+<td style="text-align: center;">Bør ikke anvendes (til
+stadieinddeling)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Kræft i endetarm</td>
+<td style="text-align: center;">DC209</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+<p>*(10.4.2.4.1 Krav til angivelse af TNM-stadie)</p>
+<h3 id="section"></h3>
+<h3 id="klinisk-t-kategori">Klinisk T kategori </h3>
+<p>T kategori tilføjes i forbindelse med diagnosen.</p>
+<p>cTx klassifikation benyttes kun, når der ikke foreligger nogen
+undersøgelser på patienten. Er tumor ikke synlig på billeddannelse men
+ved skopi, anvendes mindste T kategori. Se gerne TNM vejledning på
+dccg.dk</p>
+<p>Underklassifikation af T3 &amp; T4 stadier
+<strong><u>bør</u></strong> anvendes, da dette erstatter separat
+variable for nedvækstdybde.</p>
+<p>Databasen anvender ikke neo-adjuverende T kategori (ycT)</p>
+<p>Foreligger cTNM først efter en procedure, hvor der endnu ikke har
+været erkendt cancer f.eks. akut operation eller endoskopisk fjernelse
+af polyp. cTNM-koder kan tilføjes i forbindelse med aktivitet, hvor
+cancer senere konstateres.</p>
+<p>Ved fund af metastaser hvor primær tumor ikke kan findes, men
+histologisk profil tyder på udgangspunkt i nedre GI, kodes som ukendt
+primær tumor (DC80.0). Disse patienter indgår ikke i databasen.</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:98%;">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 25%" />
+<col style="width: 49%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Kliniske T-stadie
+[P]</strong></th>
+<th
+style="text-align: left;"><strong>Resultatindberetning-kode</strong></th>
+<th style="text-align: left;"><strong>Kommentarer</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">cT0</td>
+<td style="text-align: left;">AZCD10</td>
+<td style="text-align: left;">Primær tumor kan ikke erkendes</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT1</td>
+<td style="text-align: left;">AZCD13</td>
+<td style="text-align: left;">Tumor vokser ned i submucosa, men ikke i
+muscularis propria</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT2</td>
+<td style="text-align: left;">AZCD14</td>
+<td style="text-align: left;">Tumor vokser ned i muscularis propria men
+ikke igennem</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT3</td>
+<td style="text-align: left;">AZCD15  </td>
+<td style="text-align: left;">Vokser igennem muscularis propria til
+subserosa (Anvend A/B)</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT3a</td>
+<td style="text-align: left;">AZCD15A  </td>
+<td style="text-align: left;">Nedvækst op til 1 mm igennem muscularis
+propria</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT3b</td>
+<td style="text-align: left;">AZCD15B  </td>
+<td style="text-align: left;">Nedvækst 2 til 5 mm igennem muscularis
+propria</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT3c</td>
+<td style="text-align: left;">AZCD15C  </td>
+<td style="text-align: left;">Nedvækst 6 til 15 mm igennem muscularis
+propria</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT3d</td>
+<td style="text-align: left;">AZCD15D</td>
+<td style="text-align: left;">Nedvækst &gt;15 mm igennem muscularis
+propria</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT4</td>
+<td style="text-align: left;">AZCD16</td>
+<td style="text-align: left;">Tumor genembryder serosa  (Anvend
+A/B)</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT4a</td>
+<td style="text-align: left;">AZCD16A</td>
+<td style="text-align: left;">Gennembryder serosa til viscerale
+peritoneum</td>
+</tr>
+<tr>
+<td style="text-align: left;">cT4b</td>
+<td style="text-align: left;">AZCD16B</td>
+<td style="text-align: left;">Indvækst i tilstødende organ eller
+struktur</td>
+</tr>
+<tr>
+<td style="text-align: left;">cTx</td>
+<td style="text-align: left;">AZCD19</td>
+<td style="text-align: left;">Bør ikke anvendes (se ovenfor).</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+<h3 id="klinisk-n-kategori">Klinisk N kategori </h3>
+<p>N kategori tilføjes i forbindelse med diagnosen.</p>
+<p>cNx klassifikation benyttes kun, når der ikke foreligger nogen
+undersøgelser på patient.</p>
+<p>Se TNM vejledning på dccg.dk</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:98%;">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 30%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Kliniske N-stadie
+[P]</strong></th>
+<th
+style="text-align: left;"><strong>Resultatindberetning-kode</strong></th>
+<th style="text-align: left;"><strong>Kommentarer</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">cN0</td>
+<td style="text-align: left;">AZCD30 </td>
+<td style="text-align: left;">Ingen regionale lymfeknudemetastaser</td>
+</tr>
+<tr>
+<td style="text-align: left;">cN1</td>
+<td style="text-align: left;">AZCD31</td>
+<td style="text-align: left;">1-3 suspekte lymfeknuder</td>
+</tr>
+<tr>
+<td style="text-align: left;">cN2</td>
+<td style="text-align: left;">AZCD32</td>
+<td style="text-align: left;">4+ suspekte lymfeknuder</td>
+</tr>
+<tr>
+<td style="text-align: left;">cNx</td>
+<td style="text-align: left;">AZCD39</td>
+<td style="text-align: left;">Bør ikke anvendes (se ovenfor).</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+<h3 id="klinisk-m-kategori">Klinisk M kategori </h3>
+<p>M kategori tilføjes i forbindelse med diagnosen.</p>
+<p>cMx klassifikation eksisterer ikke.</p>
+<p>Organ specifikke lokalisationskoder for metastaser angives som
+tillægskode til cancerkoden.</p>
+<p>TNM indsamles i forbindelse med indrapportering til
+cancerregistret</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:98%;">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 27%" />
+<col style="width: 45%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Kliniske M-stadie
+[P]</strong></th>
+<th
+style="text-align: left;"><strong>Resultatindberetning-kode</strong></th>
+<th style="text-align: left;"><strong>Kommentarer</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">cM0</td>
+<td style="text-align: left;">AZCD40</td>
+<td style="text-align: left;">cM0: Ingen fjernmetastaser</td>
+</tr>
+<tr>
+<td style="text-align: left;">cM1a</td>
+<td style="text-align: left;">AZCD41A  </td>
+<td style="text-align: left;">cM1a: Fjernmetastase i et organ
+system</td>
+</tr>
+<tr>
+<td style="text-align: left;">cM1b</td>
+<td style="text-align: left;">AZCD41B</td>
+<td style="text-align: left;">cM1b: Fjernmetastase i flere
+organsystemer</td>
+</tr>
+<tr>
+<td style="text-align: left;">cM1c</td>
+<td style="text-align: left;">AZCD41C</td>
+<td style="text-align: left;">cM1c: Fjernmetastase i peritoneum +/-
+andre organer</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+<h3 id="mdt-konference">MDT-konference</h3>
+<p>DCCG-databasen indsamler/anvender koder for</p>
+<ul>
+<li>Behandlingsbesluttende MDT</li>
+<li>Postoperativ opfølgnings MDT</li>
+<li>National MDT.</li>
+</ul>
+<p>For at koderne skal anvendes, skal betingelserne under beskrivelsen
+være opfyldt.</p>
+<p>Der kan afholdes flere behandlingsbesluttende MDT’er i et
+patientforløb.</p>
+<p>Der bør kun optræde en behandlingsbesluttende MDT forud for en
+DCCG-procedure, men hvis klinisk relevant kan flere anvendes.</p>
+<p>Yderligere behandlingsbesluttende MDT’er må gerne kodes ved
+behandlingsintentions-skifte eller ændringer i planlagte procedurer.</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:99%;">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 11%" />
+<col style="width: 71%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>MDT_konference [P]</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentarer</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Behandlingsbesluttende</td>
+<td style="text-align: left;">ZZ0190D1</td>
+<td style="text-align: left;"><p>Kræver minimum deltagelse af kirurg,
+onkolog, patolog samt radiolog.</p>
+<p>Kræver MDT foretager beslutning om behandlingsstrategi samt der
+foreligger tilfredsstillende diagnostiske undersøgelser</p></td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ opfølgning</td>
+<td style="text-align: left;">ZZ0190D2</td>
+<td style="text-align: left;">Der foretages systematisk audit af det
+operativ forløb med henblik på efterforløb samt kvalitetssikring.</td>
+</tr>
+<tr>
+<td style="text-align: left;">National</td>
+<td style="text-align: left;">ZZ0190D3</td>
+<td style="text-align: left;">Afholdes på højtspecialiseret afdeling med
+deltagelse af nationale centre</td>
+</tr>
+<tr>
+<td style="text-align: left;">MDT</td>
+<td style="text-align: left;">ZZ0190D</td>
+<td style="text-align: left;">MDT hvor der ikke kan foretages endelig
+behandlingsbeslutning</td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="patient-oplysninger-sec">
+<h1 id="patient-oplysninger">Patient oplysninger</h1>
+<h2 id="performance-status">Performance Status</h2>
+<p>Performance status (ECOG) oplyses som den, der danner grundlag for
+behandlingsbeslutningen.</p>
+<p>Der bør ikke foretages vurdering ud fra journal gennemgang. Her bør
+anvendes performance status ukendt. Hvis der i databasen/LPR findes
+flere værdier vælges sidste inden proceduren.</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 22%" />
+<col style="width: 43%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Vurdering [P]</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Performance Status 0</td>
+<td style="text-align: left;">ZZV020U0</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status 1</td>
+<td style="text-align: left;">ZZV020U1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status 2</td>
+<td style="text-align: left;">ZZV020U2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status 3</td>
+<td style="text-align: left;">ZZV020U3</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status 4</td>
+<td style="text-align: left;">ZZV020U4</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status 5</td>
+<td style="text-align: left;">ZZV020U5</td>
+<td style="text-align: left;">Død</td>
+</tr>
+<tr>
+<td style="text-align: left;">Performance Status ukendt</td>
+<td style="text-align: left;">ZZV020U9</td>
+<td style="text-align: left;">Oplysning ikke tilgængelig i journal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="asa-klassifikation">ASA-klassifikation</h2>
+<p>ASA-score oplyses som den, der danner grundlag for
+behandlingsbeslutningen. Der bør ikke foretages vurdering iht.
+journalvurdering. Her bør anvendes ASA ukendt. Patienter der ikke får
+foretaget resektion skal også have indrapporteret ASA, da grundet til
+fravalg af resektion kan være for høj score (forklarende variabel).</p>
+<p>Det foretrækkes at ASA registreres på procedurekoden i forbindelse
+med vurdering af patient – dvs. tilknyttes operation eller anden
+kontrolbesøg/indlæggelse</p>
+<p>Ved flere opgivne vælges sidste inden proceduren</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 39%" />
+<col style="width: 18%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Vurdering [ikke-P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 1</td>
+<td style="text-align: left;">EZA1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 2</td>
+<td style="text-align: left;">EZA2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 3</td>
+<td style="text-align: left;">EZA3</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 4</td>
+<td style="text-align: left;">EZA4</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 5</td>
+<td style="text-align: left;">EZA5</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA 6</td>
+<td style="text-align: left;">EZA6</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">ASA funktionsniveau, ASA Ukendt (9)</td>
+<td style="text-align: left;">EZA9</td>
+<td style="text-align: left;">Oplysning ikke tilgængelig i journal</td>
+</tr>
+</tbody>
+</table>
+<h2 id="alkohol-indtag">Alkohol indtag</h2>
+<p>Enkelt eller begge kan anvendes</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 22%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Alkoholforbrug</strong></th>
+<th style="text-align: left;"><strong>diagnosekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Alkohol &gt;10 genstande ugentligt</td>
+<td style="text-align: left;">DZ721C</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Alkoholindtag overskrider 4 genstande
+dagligt</td>
+<td style="text-align: left;">DZ721D</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h2 id="tobak-anvendelse">Tobak anvendelse</h2>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 31%" />
+<col style="width: 26%" />
+<col style="width: 39%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Nuværende rygestatus
+[P]</strong></th>
+<th style="text-align: left;"><strong>Pseudo-
+procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Ryger</td>
+<td style="text-align: left;">ZZP01A1A</td>
+<td style="text-align: left;">Ryger (Inden for seneste 8 uger)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tidligere ryger</td>
+<td style="text-align: left;">ZZP01A1B2</td>
+<td style="text-align: left;">Ikke røget de seneste 8 uger</td>
+</tr>
+<tr>
+<td style="text-align: left;">Aldrig ryger</td>
+<td style="text-align: left;">ZZP01A1B3</td>
+<td style="text-align: left;">Ingen eller minimalt tidligere
+forbrug</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rygestopper</td>
+<td style="text-align: left;">ZZP01A1B1</td>
+<td style="text-align: left;">Anvendes ikke</td>
+</tr>
+</tbody>
+</table>
+<h2 id="højde-vægt">Højde &amp; Vægt</h2>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 34%" />
+<col style="width: 26%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Patientens højde og
+vægt[P]</strong></th>
+<th style="text-align: left;"><strong>Pseudo-procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Legemshøjde (cm)</td>
+<td style="text-align: left;">ZZ0241+ VPH####</td>
+<td style="text-align: left;">I tillægskoden angives højden i cm.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Legemsvægt (kg)</td>
+<td style="text-align: left;">ZZ0240+ VPH####</td>
+<td style="text-align: left;">I tillægskoden angives vægten i kg.</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="rektum-cancer-specifikke-koder-sec">
+<h1 id="rektum-cancer-specifikke-koder">Rektum Cancer – Specifikke
+koder</h1>
+<p>Disse koder kan ved manglende patologisk verifikation inden operation
+tilføjes patienter med diagnosekoden DC20.9. efter operation</p>
+<h2 id="højde-på-rektumtumor-bestemt-ved-rektoskopi">Højde på
+rektumtumor – bestemt ved rektoskopi</h2>
+<p>Husk at kode rektoskopi som procedure i LPR</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Pseudo-procedurekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rectum Tumor Højde + bestemt ved
+Rectoskop</td>
+<td>ZZV009A1A+ VPH####</td>
+</tr>
+</tbody>
+</table>
+<h2 id="højde-på-rectumtumor-mr">Højde på rectumtumor – MR</h2>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 60%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Pseudo-procedurekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rectum Tumor Højde + bestemt ved MR</td>
+<td>ZZV009A1B+ VPH####</td>
+</tr>
+</tbody>
+</table>
+<h2 id="højde-på-rectumtumor-ukendt-både-mr-og-rectoskopi">Højde på
+rectumtumor – ukendt (både MR og rectoskopi)</h2>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Pseudo-procedurekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rectum Tumor Højde/størrelse ukendt</td>
+<td>ZZV009A9</td>
+</tr>
+</tbody>
+</table>
+<p>Anvendes hvis der hverken foreligger rektoskopi eller MR. Ikke
+udfyldt værdi for disse uden udfyldt ukendt kode tolkes som manglende
+indtastning.</p>
+<h2 id="nedvækst-af-rectumtumor-mr">Nedvækst af rectumtumor – MR</h2>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 69%" />
+<col style="width: 28%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Pseudo-procedurekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Tumor nedvækst under tunica muscularis
+(mm) + VPH</td>
+<td>ZZV009A2+ VPH####</td>
+</tr>
+</tbody>
+</table>
+<h2 id="emvi-rectumtumor-mr">EMVI rectumtumor – MR</h2>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Tillægskoder til diagnosekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Veneinvasion påvist ved MR-skanning</td>
+<td>ZDW58B1</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="korteste-afstand-mellem-cancervæv-og-den-mesorektale-fascie">Korteste
+afstand mellem cancervæv og den mesorektale fascie</h2>
+<p>Defineres som mm. Der skelnes ikke mellem tumor, suspekt lymfeknuder
+eller tumordeposit (mm).</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 74%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Tillægskoder til diagnosekoder
+[P]</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Afstand til mesorektale fascie &lt;= 1
+mm</td>
+<td>ZDW61D1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Afstand til mesorektale fascie &gt; 1
+mm</td>
+<td>ZDW61D2</td>
+</tr>
+<tr>
+<td style="text-align: left;">afstand til mesorektale fascie ukendt</td>
+<td>ZDW61D9</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="hjaelpesektion-basisinformationer-sec">
+<h1 id="hjælpesektion-for-basis-informationer">Hjælpesektion for basis
+informationer</h1>
+<p>DCCG anvender også disse koder i basis oplysninger</p>
+<h3 id="komorbiditets-registrering">Komorbiditets-Registrering</h3>
+<p>Husk at kontrollere at patientens komorbiditet og andre tilstande og
+procedurer er registreret.</p>
+<p>Udvalgte nedenstående med speciel opmærksomhed for DCCG.</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 28%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Anæmi [P]</strong></th>
+<th style="text-align: left;"><strong>Bi-diagnosekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Jernmangelanæmi UNS</td>
+<td style="text-align: left;">DD509</td>
+<td style="text-align: left;">Se DCCG retningslinjer.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anæmi UNS</td>
+<td style="text-align: left;">DD649</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="cancer-specifikke-procedurer">Cancer specifikke Procedurer</h3>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 31%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Behandling, f.eks. tilskud af jern
+[P]</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Behandling med peroral jernpræparat</td>
+<td style="text-align: left;">BOHC10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med parenteralt jern</td>
+<td style="text-align: left;">BOHC12</td>
+</tr>
+</tbody>
+</table>
+<h3 id="familieanamnese-med-kræft-i-fordøjelsesorganer">Familieanamnese
+med kræft i fordøjelsesorganer</h3>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 45%" />
+<col style="width: 17%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Familiær kræft i
+fordøjelsesorganer[P]</strong></th>
+<th style="text-align: left;"><strong>Diagnosekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Familieanamnese med kræft i
+fordøjelsesorganer</td>
+<td style="text-align: left;">DZ800</td>
+<td style="text-align: left;">Se tværfaglige/DCCG-retningslinjer.</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="kirurgiske-procedurer-sec">
+<h1
+id="kodning-ved-kirurgiske-procedurer-på-kolorektalcancerpatienter">Kodning
+ved Kirurgiske Procedurer på kolorektalcancerpatienter</h1>
+<h2 id="proceduresigte-ved-det-kirurgiske-indgreb">Proceduresigte ved
+det kirurgiske indgreb</h2>
+<p>Proceduresigtet defineres som den endelige intention bag
+proceduren.</p>
+<p>Den er ikke nødvendigvis bestemt forud for en procedure. Dvs. en
+planlagt kurativ procedure, der slutteligt (umiddelbart efter proceduren
+er udført) er palliativ, skal kodes som palliativ. Koden skal ikke
+ændres senere hvis der meget senere ændres intention.</p>
+<p>Eksempel: en operation vurderes at kunne udføres med kurativt sigte
+på MDT, desværre under operation findes udbredt karcinose. Man vælger
+dog at foretage resektion af primær tumor. Her er koden palliativ.</p>
+<p>Bridge-to-surgery indgreb: Stent anlæggelser eller stomianlæggelser i
+hvor der senere påtænkes at der skal udføres et kurativt
+indgreb/behandling intentions kodes som kurativ.</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Procedurens intention
+[P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Diagnostisk</td>
+<td style="text-align: left;">ZPZA01</td>
+</tr>
+<tr>
+<td style="text-align: left;">Intenderet kurativ behandling</td>
+<td style="text-align: left;">ZPZA02C</td>
+</tr>
+<tr>
+<td style="text-align: left;">Palliativ</td>
+<td style="text-align: left;">ZPZA05</td>
+</tr>
+</tbody>
+</table>
+<h2 id="prioritet">Prioritet</h2>
+<p>En akut operation defineres som en procedure, der ikke kan afvente
+regelret udredningsprogram. Dette kan være på forløb der er akutte eller
+elektive. Det er operatørens vurdering der gælder.</p>
+<table>
+<colgroup>
+<col style="width: 95%" />
+<col style="width: 4%" />
+</colgroup>
+<thead>
+<tr>
+<th><table style="width:97%;">
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 48%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Akut udført operation
+[non-P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Udført Akut</td>
+<td style="text-align: left;">ZPTP01</td>
+</tr>
+</tbody>
+</table></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<p>Ved akut operation anføres tilstande, der fører til den akutte
+indikation som bi-diagnoser f.eks. ileus, perforation etc.</p>
+<h2 id="konvertering">Konvertering</h2>
+<p>Der er foretaget konvertering hvis et indgreb var intenderet
+laparoskopisk og anden minimal invasiv kirurgi, men grundet tekniske
+eller intraoperative komplikationer må konverteres til åben kirurgi.</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 40%" />
+<col style="width: 32%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Konvertering af indgrebstype
+[non-P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+procedurekode</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Anden konvertering til åbent indgreb</td>
+<td style="text-align: left;">KZYK96</td>
+<td>Anvendes i alle tilfælde</td>
+</tr>
+</tbody>
+</table>
+<h2 id="robot-assisteret">Robot assisteret</h2>
+<p>Hvis et indgreb har involveret anvendelse af robot, uafhængig af
+tid.</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 35%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Anvendelse af robot
+[non-P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+procedurekode</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Robot assisteret</td>
+<td style="text-align: left;">KZXX00</td>
+<td>Anvendes i alle tilfælde</td>
+</tr>
+</tbody>
+</table>
+<h2 id="resektionstype">Resektionstype</h2>
+<p>Se vejledning på DCCG.dk, her også tolkning ift. definition for
+CME-kirurgi.</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 79%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Resektionstype</strong></th>
+<th style="text-align: left;"><strong>Tillægskode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">D0: ukomplet excision af tumornære
+lymfeknuder</td>
+<td style="text-align: left;">KZLG00D0</td>
+</tr>
+<tr>
+<td style="text-align: left;">D1: komplet excision af tumornære
+lymfeknuder</td>
+<td style="text-align: left;">KZLG00D1</td>
+</tr>
+<tr>
+<td style="text-align: left;">D2: komplet excision af tumornære
+lymfeknuder og intermediære lymfeknuder</td>
+<td style="text-align: left;">KZLG00D2</td>
+</tr>
+<tr>
+<td style="text-align: left;">D3: komplet excision af tumornære
+lymfeknuder og alle regionale lymfeknuder</td>
+<td style="text-align: left;">KZLG00D3</td>
+</tr>
+<tr>
+<td style="text-align: left;">D9: ingen oplysninger om excision af
+tumornære lymfeknuder</td>
+<td style="text-align: left;">KZLG00D9</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="dccg-procedure-endoskopi-sec">
+<h1 id="hjælpesektion-for-kirurgiske-procedurer">Hjælpesektion for
+kirurgiske procedurer</h1>
+<h1 id="dccg-procedure">DCCG-procedure:</h1>
+<p>Proceduren kodes efter hvilken endelig procedure, der er udført og
+ikke den planlagte.</p>
+<p>Procedure beskrevet på DCCG.dk</p>
+<h3 id="kolon-resektioner">Kolon resektioner</h3>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 82%" />
+<col style="width: 8%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Kolon resektioner</strong></th>
+<th colspan="2"
+style="text-align: left;"><strong>Procedure</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Ileocækal resektion</td>
+<td colspan="2" style="text-align: left;">KJFB20</td>
+</tr>
+<tr>
+<td style="text-align: left;">Højresidig hemikolektomi</td>
+<td colspan="2" style="text-align: left;">KJFB30</td>
+</tr>
+<tr>
+<td style="text-align: left;">Udvidet højresidig hemikolektomi</td>
+<td colspan="2" style="text-align: left;">KJFB30A</td>
+</tr>
+<tr>
+<td style="text-align: left;">Subtotal kolektomi</td>
+<td colspan="2" style="text-align: left;">KJFB30B</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden samtidig resektion af tyndtarm og
+tyktarm</td>
+<td colspan="2" style="text-align: left;">KJFB33</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af colon transversum</td>
+<td colspan="2" style="text-align: left;">KJFB40</td>
+</tr>
+<tr>
+<td style="text-align: left;">Venstresidig hemikolektomi</td>
+<td colspan="2" style="text-align: left;">KJFB43</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af colon sigmoideum</td>
+<td colspan="2" style="text-align: left;">KJFB46</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af colon sigmoideum med
+kolostomi</td>
+<td colspan="2" style="text-align: left;">KJFB60</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af venstre fleksur</td>
+<td colspan="2" style="text-align: left;">KJFB53</td>
+</tr>
+<tr>
+<td style="text-align: left;">Udvidet venstresidig hemikolektomi</td>
+<td colspan="2" style="text-align: left;">KJFB56</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden colonresektion</td>
+<td colspan="2" style="text-align: left;">KJFB50</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden tyktarmsresektion med kolostomi og
+distal lukning</td>
+<td colspan="2" style="text-align: left;">KJFB63</td>
+</tr>
+<tr>
+<td style="text-align: left;">Kolektomi og ileorektostomi</td>
+<td colspan="2" style="text-align: left;">KJFH00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Kolektomi og ileostomi</td>
+<td colspan="2" style="text-align: left;">KJFH10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Proktokolektomi og ileostomi</td>
+<td colspan="2" style="text-align: left;">KJFH20</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transluminal endoskopisk assisteret
+laparoskopisk excision af patologisk væv i tyktarm (CELS)</td>
+<td colspan="2" style="text-align: left;">KJFA87</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk ileocækal resektion</td>
+<td style="text-align: left;">KJFB21</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk højresidig
+hemikolektomi</td>
+<td style="text-align: left;">KJFB31</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk udvidet højresidig
+hemikolektomi</td>
+<td style="text-align: left;">KJFB31A</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk subtotal kolektomi</td>
+<td style="text-align: left;">KJFB31B</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden laparoskopisk samtidig resektion af
+tyndtarm og tyktarm</td>
+<td style="text-align: left;">KJFB34</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af colon
+transversum</td>
+<td style="text-align: left;">KJFB41</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk venstresidig
+hemikolektomi</td>
+<td style="text-align: left;">KJFB44</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af colon
+sigmoideum</td>
+<td style="text-align: left;">KJFB47</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af colon
+sigmoideum med kolostomi og distal lukning</td>
+<td style="text-align: left;">KJFB61</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af venstre
+fleksur</td>
+<td style="text-align: left;">KJFB54</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk udvidet venstresidig
+hemikolektomi</td>
+<td style="text-align: left;">KJFB57</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden laparoskopisk colonresektion</td>
+<td style="text-align: left;">KJFB51</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden laparoskopisk colonresektion med
+kolostomi og distal lukning</td>
+<td style="text-align: left;">KJFB64</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk kolektomi og
+ileorektostomi</td>
+<td style="text-align: left;">KJFH01</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk kolektomi og ileostomi</td>
+<td style="text-align: left;">KJFH11</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk proktokolektomi og
+ileostomi</td>
+<td style="text-align: left;">KJFH21</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk assisteret transluminal
+endoskopisk excision af patologisk væv i tyktarm (CELS)</td>
+<td style="text-align: left;">KJFA88</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="endetarm-resektioner">Endetarm resektioner</h3>
+<p>Procedure defineret iht. DCCG.dk</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 18%" />
+<col style="width: 12%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Endetarmresektioner</strong></th>
+<th style="text-align: left;"><strong>Procedure</strong></th>
+<th style="text-align: left;"><strong>Type</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Resektion af endetarm</td>
+<td style="text-align: left;">KJGB00</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af endetarm med kolostomi</td>
+<td style="text-align: left;">KJGB10</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abdominal og ischioanal excision af
+endetarm</td>
+<td style="text-align: left;">KJGB35</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abdominal og ekstralevatorisk excision af
+endetarm</td>
+<td style="text-align: left;">KJGB36</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abdominal og perineal excision af
+endetarm</td>
+<td style="text-align: left;">KJGB30</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abdominal og intersphincterisk excision af
+endetarm</td>
+<td style="text-align: left;">KJGB32</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Abdominal og transanal resektion af
+endetarm</td>
+<td style="text-align: left;">KJGB06</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Proktokolektomi og ileostomi</td>
+<td style="text-align: left;">KJFH20</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Total bækkenrømning</td>
+<td style="text-align: left;">KLCE20</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af endetarm</td>
+<td style="text-align: left;">KJGB01</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk resektion af endetarm med
+kolostomi</td>
+<td style="text-align: left;">KJGB11</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk og ischioanal excision af
+endetarm</td>
+<td style="text-align: left;">KJGB37</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk og ekstralevatorisk excision
+af endetarm</td>
+<td style="text-align: left;">KJGB34</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk og perineal excision af
+endetarm</td>
+<td style="text-align: left;">KJGB31</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk og intersphincterisk
+excision af endetarm</td>
+<td style="text-align: left;">KJGB33</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk og transanal resektion af
+endetarm</td>
+<td style="text-align: left;">KJGB04</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk proktokolektomi og
+ileostomi</td>
+<td style="text-align: left;">KJFH21</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk transperineal excision af
+endetarm</td>
+<td style="text-align: left;">KJGB31B</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+</tbody>
+</table>
+<h3 id="palliativebridge-to-surgery-procedurer">Palliative/Bridge to
+surgery procedurer</h3>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 61%" />
+<col style="width: 21%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Palliative/Bridge to surgery
+procedurer</strong></th>
+<th style="text-align: left;"><strong>Procedure</strong></th>
+<th style="text-align: left;"><strong>Type</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Endoskopisk indsættelse af stent i
+tyktarm</td>
+<td style="text-align: left;">KJFA68</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Rektoskopisk indsættelse af stent i
+endetarm</td>
+<td style="text-align: left;">KJGA58A</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loop enterostomi</td>
+<td style="text-align: left;">KJFF10</td>
+<td style="text-align: left;">åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk loop enterostomi</td>
+<td style="text-align: left;">KJFF11</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Terminal enterostomi</td>
+<td style="text-align: left;">KJFF13</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transversostomi</td>
+<td style="text-align: left;">KJFF23</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk transversostomi</td>
+<td style="text-align: left;">KJFF24</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sigmoideostomi</td>
+<td style="text-align: left;">KJFF26</td>
+<td style="text-align: left;">Åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk sigmoideostomi</td>
+<td style="text-align: left;">KJFF27</td>
+<td style="text-align: left;">Skopi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ileotransversostomi</td>
+<td style="text-align: left;">KJFC10</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="andre-procedurer">Andre procedurer</h3>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 48%" />
+<col style="width: 30%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Andre procedurer</strong></th>
+<th style="text-align: left;"><strong>Procedure</strong></th>
+<th style="text-align: left;"><strong>Type</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Eksplorativ laparotomi</td>
+<td style="text-align: left;">KJAH00</td>
+<td style="text-align: left;">åben</td>
+</tr>
+<tr>
+<td style="text-align: left;">laparoskopi</td>
+<td style="text-align: left;">KJAH01</td>
+<td style="text-align: left;">skopi</td>
+</tr>
+</tbody>
+</table>
+<h3 id="supplerende-resektioner">Supplerende resektioner</h3>
+<p>Her skelnes mellem resektioner af organer, hvor der er involvering af
+erkendt patologisk væv, eller resektion af områder, hvor der enten er
+indvækst eller ikke erkendt involvering. (jf. de to afsnit omkring
+per-operative supplerende resektioner vs. supplerende
+excisioner/destruktioner af patologisk væv)</p>
+<h3 id="per-operative-supplerende-resektioner">Per-operative supplerende
+resektioner</h3>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 43%" />
+<col style="width: 15%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Per-operative supplerende
+resektioner [P]</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Note</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Supracolisk omentektomi</td>
+<td style="text-align: left;">KJAL30B</td>
+<td style="text-align: left;">Ved fjernelse af gastrokoliske
+ligament</td>
+</tr>
+<tr>
+<td style="text-align: left;">Infracoliske omentektomi</td>
+<td style="text-align: left;">KJAL30A</td>
+<td style="text-align: left;">Typisk ved udv. hø. hemikolektomi</td>
+</tr>
+<tr>
+<td style="text-align: left;">Radikal excision af iliakale
+lymfeknuder</td>
+<td style="text-align: left;">KPJD54</td>
+<td style="text-align: left;">Anvendes ved resektion af laterale
+lymfeknuder</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk radikal excision af iliakale
+lymfeknuder</td>
+<td style="text-align: left;">KPJD74</td>
+<td style="text-align: left;">Anvendes ved resektion af kompartment på
+bækkenvæg</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden excision af pancreas</td>
+<td style="text-align: left;">KJLC96</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden operation på tyndtarm eller
+tyktarm</td>
+<td style="text-align: left;">KJFW96</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Enkeltsidig salpingo-ooforektomi</td>
+<td style="text-align: left;">KLAF00</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk enkeltsidig
+salpingo-ooforektomi</td>
+<td style="text-align: left;">KLAF01</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Dobbeltsidig salpingo-ooforektomi</td>
+<td style="text-align: left;">KLAF10</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk dobbeltsidig
+salpingo-ooforektomi</td>
+<td style="text-align: left;">KLAF11</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Andre operationer på brystvæg, pleura og
+diafragma</td>
+<td style="text-align: left;">KGAW*</td>
+<td style="text-align: left;">Alle undertyper</td>
+</tr>
+<tr>
+<td style="text-align: left;">Resektion af milt</td>
+<td style="text-align: left;">KJMA00</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden resektion eller vævsdestruktion i
+urinblæren</td>
+<td style="text-align: left;">KKCD96</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="supplerende-excisiondestruktion-af-patologisk-væv">Supplerende
+excision/destruktion af patologisk væv</h3>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 77%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Supplerende excision/destruktion
+af patologisk væv</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Destruktion af patologisk væv i lever</td>
+<td style="text-align: left;">KJJA43</td>
+</tr>
+<tr>
+<td style="text-align: left;">Radiofrekvensablation (RFA) af patologisk
+væv i lever</td>
+<td style="text-align: left;">KJJA43A</td>
+</tr>
+<tr>
+<td style="text-align: left;">Mikrobølgeablation (MWA) af patologisk væv
+i lever</td>
+<td style="text-align: left;">KJJA43B</td>
+</tr>
+<tr>
+<td style="text-align: left;">Excision af patologisk væv i lever</td>
+<td style="text-align: left;">KJJA40</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk excision af patologisk væv i
+lever</td>
+<td style="text-align: left;">KJJA41</td>
+</tr>
+<tr>
+<td style="text-align: left;">Excision af patologisk væv i binyre</td>
+<td style="text-align: left;">KBCA20</td>
+</tr>
+<tr>
+<td style="text-align: left;">Excision af patologisk væv i bugvæg</td>
+<td style="text-align: left;">KJAA10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk biopsi eller excision af
+patologisk væv i diafragma</td>
+<td style="text-align: left;">KJBA11</td>
+</tr>
+<tr>
+<td style="text-align: left;">Excision af retroperitonealt patologisk
+væv</td>
+<td style="text-align: left;">KKKB10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden excision eller destruktion af
+patologisk væv i ovarie</td>
+<td style="text-align: left;">KLAC96</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden laparoskopisk excision eller
+destruktion af patologisk væv i ovarie</td>
+<td style="text-align: left;">KLAC97</td>
+</tr>
+<tr>
+<td style="text-align: left;">Excision eller destruktion af patologisk
+væv i bughinde</td>
+<td style="text-align: left;">KJAL20</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk excision eller destruktion
+af patologisk væv i bughinde</td>
+<td style="text-align: left;">KJAL21</td>
+</tr>
+</tbody>
+</table>
+<h3 id="per-operativt-fund-af-metastatisk-sygdom">Per-operativt fund af
+metastatisk sygdom</h3>
+<p>Kodes overordnet iht. gældende vejledning, dvs. kodes med
+lokalisering af metastase som bi-diagnose, skal tilføjes forløb, ikke
+nødvendigvis i forbindelse med procedure. Per-operative supplerende
+resektioner, kodes som procedurer iht. SKS.</p>
+<h1 id="endoskopiske-indgreb">Endoskopiske indgreb</h1>
+<p>Endoskopiske indgreb kan foretages før eller efter der foreligger en
+diagnose.</p>
+<p>Hvis diagnose ikke foreligger (f.eks. fund i polyp) skal
+behandlingsintention påføres retroaktivt.</p>
+<p>Behandlingsbesluttende MDT kan afholdes efter en procedure i dette
+tilfælde, hvis der ikke foretages yderligere.</p>
+<p>Der skal også indberettes basis informationer på patienter, der
+udelukkende er endoskopisk behandlet. Disse kan tilføjes til kontakter
+efter proceduren.</p>
+<p>For procedure, hvor der tilstøder komplikationer, skal disse kodes
+iht. LPR koder nedenfor.</p>
+<h3 id="intentions-kodning">Intentions kodning</h3>
+<p>For planlagte procedure efter behandlingsbesluttende MDT skal der
+påføres intention samt nødvendige koder for at beskrive forløb ift.
+komplikationer, reoperationer osv. (se resektioner)</p>
+<p>Anvender samme princip som kirurgiske resektion</p>
+<h3 id="hjælpeliste-over-endoskopiske-procedurer">Hjælpeliste over
+endoskopiske procedurer</h3>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 62%" />
+<col style="width: 17%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Endoskopiske indgreb</strong></th>
+<th style="text-align: left;"><strong>Procedurekoder [P]</strong></th>
+<th style="text-align: left;"><strong>Kommentarer</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Endoskopisk polypektomi i tyktarm</td>
+<td style="text-align: left;">KJFA15</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Rektoskopisk polypektomi i endetarm</td>
+<td style="text-align: left;">KJGA05</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Transanal excision af patologisk væv i
+endetarm</td>
+<td style="text-align: left;">KJGA73</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Rektoskopisk mikrokirugisk excision af
+patologisk væv i endetarm</td>
+<td style="text-align: left;">KJGA75</td>
+<td style="text-align: left;">TEM/TEO/TAMIS</td>
+</tr>
+<tr>
+<td style="text-align: left;">Endoskopisk mucosa resektion (EMR),
+endetarm</td>
+<td style="text-align: left;">KJGA52A</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Endoskopisk submucøs dissektion (ESD),
+endetarm</td>
+<td style="text-align: left;">KJGA52B</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Endoskopisk mucosa resektion (EMR),
+tyktarm</td>
+<td style="text-align: left;">KJFA55A</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Endoskopisk submucøs dissektion (ESD),
+tyktarm</td>
+<td style="text-align: left;">KJFA55B</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Transluminal endoskopisk assisteret
+laparoskopisk excision af patologisk væv i tyktarm (CELS)</td>
+<td style="text-align: left;">KJFA87</td>
+<td style="text-align: left;">tillægskoder til resektion</td>
+</tr>
+<tr>
+<td style="text-align: left;">Laparoskopisk assisteret transluminal
+endoskopisk excision af patologisk væv i tyktarm (CELS)</td>
+<td style="text-align: left;">KJFA88</td>
+<td style="text-align: left;">tillægskoder til resektion</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="komplikationsregistrering-sec">
+<h1 id="komplikationsregistrering">Komplikationsregistrering</h1>
+<p>Komplikationer opgøres per kontakt (indlæggelse).</p>
+<p>Der foretages en samlet opgørelse fra proceduren til
+udskrivelse/afslutning af kontakt.</p>
+<p>Samtlige komplikationer tilføjes via SKS koder (se eksempler i
+tabel).</p>
+<p>Ved et forløb der er vurderet uden komplikationer, er det vigtigt at
+tilføje koden “Ingen komplikationer” se nedenfor.</p>
+<p>Ved anastomoselæk og evt. reoperation påføres disse koder også – se
+senere.</p>
+<p>Hvis der har været komplikationer, kan den højeste kategori af
+komplikation under indlæggelsen angives via Clavien-Dindo.</p>
+<p>Hvis et forløb ikke er angivet som “ingen komplikationer” eller har
+en Clavien-Dindo gradering, angives komplikationsregistreringen som ikke
+udført. Dette vil som nævnt i indledning være en supplerende indikator
+mhp. at danne mangellister</p>
+<h2 id="komplikationsfrit-indgreb">Komplikationsfrit indgreb</h2>
+<p>Et ukompliceret forløb - defineret som ingen medicinske eller
+kirurgiske komplikationer kodes med VV00051. Koden registres som
+tillægskode til aktionsdiagnosen.</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 47%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Komplikationsfrit
+indgreb[P]</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+aktionsdiagnosen</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Ingen komplikationer</td>
+<td style="text-align: left;">VV00051</td>
+</tr>
+</tbody>
+</table>
+<h3 id="komplikationer">Komplikationer</h3>
+<h3
+id="komplikationer-der-opstår-under-indlæggelses-kontaktenoperationen">Komplikationer
+der opstår under indlæggelses kontakten/operationen</h3>
+<p>Per-operative komplikationer samt post-operative komplikationer
+registreres som bi-diagnoser til aktionsdiagnosen med tillægskode for
+grad.</p>
+<h3
+id="komplikationer-der-opstår-efter-udskrivelse-efter-primære-operation">Komplikationer
+der opstår efter udskrivelse efter primære operation</h3>
+<p>Registreres som aktionsdiagnose på genindlæggelse/ ambulant besøg.
+Der tilføjes tillægskode for grad (Clavien Dindo).</p>
+<h3 id="gradering-af-komplikationer">Gradering af komplikationer</h3>
+<p>Hvis der er komplikationer, vurderes det samlede forløb ift.
+Clavien-Dindo kategorier</p>
+<p>I DCCG-sammenhæng inkluderer dette medicinske og kirurgiske
+komplikationer.</p>
+<p>Det er den værste komplikation som bestemmer graden.</p>
+<h3 id="clavien-dindo">Clavien-Dindo</h3>
+<p>Clavien-dindo kodes på udskrivelsestidspunktet. Man kan kun
+indberette én.  </p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 2%" />
+<col style="width: 12%" />
+<col style="width: 84%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Grad</strong></th>
+<th style="text-align: left;">Tillægskode til diagnosekode for
+komplikation[p]</th>
+<th style="text-align: left;"><strong>Beskrivelse</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Grad 1</td>
+<td style="text-align: left;">ZDA03A1</td>
+<td style="text-align: left;">Enhver afvigelse fra det normale
+postoperative forløb uden kirurgisk, endoskopisk, radiologisk eller
+farmakologisk intervention med undtagelse af væskebehandling, behandling
+med antiemetika, febernedsættende medicin, smertestillende medicin eller
+diuretika og fysioterapi. Omfatter sårspaltning bed-side og
+hjerteinsufficiens som udelukkende behandles med diuretika.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 2</td>
+<td style="text-align: left;">ZDA03A2</td>
+<td style="text-align: left;">Medicinsk behandling inkl. blodtransfusion
+eller parenteral ernæring, men eksklusiv væskebehandling og behandling
+med antiemetika, febernedsættende medicin, smertestillende medicin eller
+diuretika.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 3a</td>
+<td style="text-align: left;">ZDA03A3A</td>
+<td style="text-align: left;">Komplikation som er behandlet kirurgisk,
+endoskopisk eller radiologisk (perkutan drænage) behandling uden
+narkose, men inkl. eventuel rus.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 3b</td>
+<td style="text-align: left;">ZDA03A3B</td>
+<td style="text-align: left;">Komplikation som er behandlet kirurgisk,
+endoskopisk eller radiologisk (perkutan drænage) behandling i narkose
+ekskl. rus.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 4a</td>
+<td style="text-align: left;">ZDA03A4A</td>
+<td style="text-align: left;">Livstruende komplikation (inkl. CNS) som
+krævede indlæggelse på en intensiv afdeling, med svigt af et organ
+(inkl. dialyse).</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 4b</td>
+<td style="text-align: left;">ZDA03A4B</td>
+<td style="text-align: left;">Livstruende komplikation (inkl. CNS) som
+krævede indlæggelse på en intensiv afdeling med multiorgansvigt.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Grad 5</td>
+<td style="text-align: left;">ZDA03A5</td>
+<td style="text-align: left;">Død.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section"></h2>
+
+</section>
+<section id="hjaelpesektion-komplikationer-sec">
+<h1 id="hjælpesektion-for-kirurgiske-komplikationer">Hjælpesektion for
+kirurgiske komplikationer</h1>
+<p>Dette er hjælpelister mhp. at anvende og ensrette kodning.</p>
+<h2 id="per-operative-komplikationer">Per-operative komplikationer</h2>
+<p>Per-operative komplikationer kodes som bidiagnoser (se ovenfor)</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 66%" />
+<col style="width: 17%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Per-operativ komplikation
+[P]</strong></th>
+<th style="text-align: left;"><strong>Diagnosekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Per-operativ blødning</td>
+<td style="text-align: left;">DT818F</td>
+<td style="text-align: left;">&gt;500 ml.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion IKA</td>
+<td style="text-align: left;">DT812</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ læsion IKA</td>
+<td style="text-align: left;">DT812A</td>
+<td style="text-align: left;">Anvend 812</td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur IKA</td>
+<td style="text-align: left;">DT812B</td>
+<td style="text-align: left;">Anvend 812</td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af gastrointestinalkanalen</td>
+<td style="text-align: left;">DT812G</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af kvindeligt kønsorgan</td>
+<td style="text-align: left;">DT812H</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ perforation af
+uterus ved resektion</td>
+<td style="text-align: left;">DT812H1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af kar eller lymfesystem</td>
+<td style="text-align: left;">DT812K</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ læsion af
+nerve</td>
+<td style="text-align: left;">DT812N</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af urinveje</td>
+<td style="text-align: left;">DT812U</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af nyre</td>
+<td style="text-align: left;">DT812UA</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af nyrebækken</td>
+<td style="text-align: left;">DT812UB</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af urinleder</td>
+<td style="text-align: left;">DT812UC</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ punktur eller
+læsion af urinblære</td>
+<td style="text-align: left;">DT812UD</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ læsion af organ med
+samtidig intervention</td>
+<td style="text-align: left;">DT812V</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Utilsigtet peroperativ læsion af organ
+uden samtidig intervention</td>
+<td style="text-align: left;">DT812W</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Fremmedlegeme utilsigtet efterladt i
+operationsfelt</td>
+<td style="text-align: left;">DT815</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>Ved Ikke klassificeret koder (IKA) kan der tilknyttes anatomisk
+lokalisation fx T000132 = milt</p>
+<h2 id="postoperative-komplikationer">Postoperative komplikationer</h2>
+<p>Opstår/ erkendes komplikationen på kontakten, hvor det kirurgiske
+indgreb er foretaget, registreres komplikationen som bidiagnose.</p>
+<p>Hvis patienten genindlægges pga. komplikation, registreres
+komplikationen som aktionsdiagnose på genindlæggelsen.</p>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 19%" />
+<col style="width: 11%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Postoperativ
+komplikation</strong></th>
+<th style="text-align: left;"><strong>Diagnosekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Post-operativ blødning</td>
+<td style="text-align: left;">DT810G</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Dyb bristning af op. sår</td>
+<td style="text-align: left;">DT813D</td>
+<td style="text-align: left;">Fascieruptur</td>
+</tr>
+<tr>
+<td style="text-align: left;">Post-op sår infektion</td>
+<td style="text-align: left;">DT814F</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Post-op intraabd abscess</td>
+<td style="text-align: left;">DT814b</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Post-op Stomi komplikation</td>
+<td style="text-align: left;">DK914D</td>
+<td style="text-align: left;">Dækker prolaps, separation, retraktion, og
+infektion som så kodes med denne og ovenstående infektionskoder</td>
+</tr>
+<tr>
+<td style="text-align: left;">Post-op Stomi nekrose</td>
+<td style="text-align: left;">DK914C</td>
+<td style="text-align: left;">Vil medføre re-operation</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ tarmobstruktion</td>
+<td style="text-align: left;">DK913</td>
+<td style="text-align: left;">Anvendes post operativ og ikke DK567.
+Denne anvendes kun ved primær symptom.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="anastomose-komplikationer">Anastomose komplikationer</h2>
+<p>Opstår/ erkendes komplikationen på kontakten, hvor det kirurgiske
+indgreb er foretaget, registreres komplikationen som bidiagnose.</p>
+<p>Hvis patienten genindlægges pga. komplikation, registreres
+komplikationen som aktionsdiagnose på genindlæggelsen.</p>
+<p>Anastomose lækager kodes iht nedenstående. Kræver et læk
+re-operation, skal der kodes ifølge nedenstående. Der kodes for evt.
+stomi og supplerende resektioner – hvis foretaget. </p>
+<p>Avital tarm i anastomose området kodes som anastomose
+læk/re-operation</p>
+<h3 id="anastomoselæk">Anastomoselæk</h3>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 44%" />
+<col style="width: 52%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Anastomoselækage</strong></th>
+<th style="text-align: left;"><strong>Tillægskoder til
+procedurekoder</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Anastomoselækage, type A</td>
+<td style="text-align: left;">ZDA03BA</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anastomoselækage, type B</td>
+<td style="text-align: left;">ZDA03BB</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anastomoselækage, type C</td>
+<td style="text-align: left;">ZDA03BC</td>
+</tr>
+</tbody>
+</table>
+<h3 id="anastomose-re-operation">Anastomose re-operation</h3>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Re-operation</strong></th>
+<th style="text-align: left;"><strong>Procedurekoder [P]</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Re-operation for sutur/anastomose insuff
+efter Gas operation</td>
+<td style="text-align: left;">KJWF00 (åben)</td>
+</tr>
+<tr>
+<td style="text-align: left;">Re-operation for sutur/anastomose insuff
+efter Gas operation</td>
+<td style="text-align: left;">KJWF01(lap)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tillægskoder-til-re-operation-for-anastomose-læk">Tillægskoder
+til re-operation for anastomose læk</h3>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 46%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Tillægskode til
+re-operation</strong></th>
+<th style="text-align: left;"><strong>Tillægskoder til
+procedurekoder</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Anastomose lækage, anastomose bevaret</td>
+<td style="text-align: left;">DT813A1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anastomose lækage, anastomose
+nedbrudt</td>
+<td style="text-align: left;">DT813A2</td>
+</tr>
+</tbody>
+</table>
+<p>Her kan der også kodes med anastomosegrad (B/C) som tillægskode til
+KJW proceduren.</p>
+<h2 id="reoperationer">Reoperationer</h2>
+<p>Alle re-operationer kodes efter re-operations klassifikation så
+specifik som muligt.</p>
+<ul>
+<li><p>Er dette ikke dækkende, anvendes KJWW96 –KJWW98 og subspecifikke
+koder for ekstra procedurer.</p></li>
+<li><p>Eksp.Lap SKAL ikke anvendes som re-operations kode.</p>
+<ul>
+<li><p>Se under anastomose re-op for specifikke kodning heraf.</p></li>
+<li><p>Ved negative fund anvendes KJWW96</p></li>
+</ul>
+<table>
+<colgroup>
+<col style="width: 84%" />
+<col style="width: 15%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Re-operation</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Sutur af sårruptur efter
+gastroenterologisk operation</td>
+<td style="text-align: left;">KJWA00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Sutur af sårruptur med anvendelse af
+traktionsnet efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWA30</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reoperation ved overfladisk infektion
+efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWB00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reoperation ved dyb infektion efter
+gastroenterologisk operation</td>
+<td style="text-align: left;">KJWC00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Perkutan endoskopisk reoperation ved dyb
+infektion efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWC01</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reoperation for overfladisk blødning efter
+gastroenterologisk operation</td>
+<td style="text-align: left;">KJWD00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reoperation for dyb blødning efter
+gastroenterologisk operation</td>
+<td style="text-align: left;">KJWE00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Perkutan endoskopisk reoperation for dyb
+blødning efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWE01</td>
+</tr>
+<tr>
+<td style="text-align: left;">Transluminal endoskopisk reoperation for
+dyb blødning efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWE02</td>
+</tr>
+<tr>
+<td style="text-align: left;">Reoperation for sutur- eller
+anastomoseinsufficiens efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWF00</td>
+</tr>
+<tr>
+<td style="text-align: left;">Perkutan endoskopisk reoperation for
+sutur- eller anastomoseinsufficiens efter gastroenterologisk
+operation</td>
+<td style="text-align: left;">KJWF01</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden reoperation efter gastroenterologisk
+operation</td>
+<td style="text-align: left;">KJWW96</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden perkutan endoskopisk reoperation
+efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWW97</td>
+</tr>
+<tr>
+<td style="text-align: left;">Anden transluminal endoskopisk reoperation
+efter gastroenterologisk operation</td>
+<td style="text-align: left;">KJWW98</td>
+</tr>
+</tbody>
+</table></li>
+</ul>
+
+</section>
+<section id="medicinske-komplikationer-sec">
+<h1 id="medicinske-komplikationer">Medicinske komplikationer</h1>
+<p>Opstår/ erkendes komplikationen på kontakten, hvor det kirurgiske
+indgreb er foretaget, registreres komplikationen som bidiagnose.</p>
+<p>Hvis patienten genindlægges pga. komplikation, registreres
+komplikationen som aktionsdiagnose på genindlæggelsen.</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 70%" />
+<col style="width: 27%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Medicinsk
+komplikation</strong></th>
+<th style="text-align: left;"><strong>Diagnosekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Postoperativ sepsis</td>
+<td style="text-align: left;">DT814D</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ arteriel emboli eller
+trombose</td>
+<td style="text-align: left;">DT817B1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ dyb venetrombose</td>
+<td style="text-align: left;">DT817C</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ lungeemboli</td>
+<td style="text-align: left;">DT817D</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ apoplexia cerebri</td>
+<td style="text-align: left;">DT817Y1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativt akut myokardieinfarkt</td>
+<td style="text-align: left;">DT817Y2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ hjerteinsufficiens</td>
+<td style="text-align: left;">DT817Y3</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ nyreinsufficiens</td>
+<td style="text-align: left;">DT817Y4</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ pneumoni</td>
+<td style="text-align: left;">DT814P</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ urinvejsinfektion</td>
+<td style="text-align: left;">DT814U</td>
+</tr>
+<tr>
+<td style="text-align: left;">Postoperativ aspirationspenumoni</td>
+<td style="text-align: left;">DT814P1</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section id="kontrol-recidiv-sec">
+<h1 id="kontrol-recidiv">Kontrol &amp; Recidiv</h1>
+<p>Kodning for recidiv følger LPR3 standard praksis, det er et krav fra
+DCCG-databasen at oplysning om lokalt recidiv angives - se opsummering
+info boks af sektion 6 &amp; 10 i LPR-inberetningsvejledningen.</p>
+<p>For at etablerer bedre datakvalitet på oplysninger om recidiv påføres
+patienter i kontrol aktiv kodning. Ligeledes registreres såfremt patient
+ikke vil eller skal kontrolleres efter klinisk skøn.</p>
+<p>Disse oplysninger kan påføres kontrolundersøgelses proceduren.</p>
+<h2
+id="kontrolundersøgelse-patient-følger-ikke-kontrolprogram">Kontrolundersøgelse
+– Patient følger ikke kontrolprogram</h2>
+<p>Optræder denne kode efter initiale procedure eller efterfølgende i
+sygdomsforløb vil patienten ikke længere indgå i kontrolalgoritmen. Hvis
+patienten afslutter sit helbredsforløb for cancerdiagnosen, tolkes dette
+implicit, som at der ikke planlægges yderligere kontrol.</p>
+<h2 id="kontrolundersøgelse-uden-recidiv">Kontrolundersøgelse – uden
+recidiv</h2>
+<p>Et kontrolbesøg uden recidiv tilføjes koden:</p>
+<table>
+<colgroup>
+<col style="width: 101%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table>
+<tbody>
+<tr>
+<td style="text-align: left;">Uden recidiv ZDW52A Tillægskode til
+procedurekode for kontrolundersøgelse</td>
+</tr>
+</tbody>
+</table>
+<hr /></td>
+</tr>
+</tbody>
+</table>
+<p>Anvendes også hvis der ikke konstateres genvækst efter kurativ
+stråleterapi for rektumcancer (se nedenfor), og tidligst efter 4 måneder
+(incidensperioden Cancerregisteret).</p>
+<h2 id="recidivsituationer">Recidivsituationer</h2>
+<p>Recidivkodning følger standard LPR-kodning ift. indrapportering og
+kodning (indberetning til cancerregisteret). DCCG kræver at der også
+indrapporteres lokal-recidiv status.</p>
+<h3 id="kontrolundersøgelse-lokal-recidiv">Kontrolundersøgelse – Lokal
+recidiv</h3>
+<table>
+<colgroup>
+<col style="width: 101%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table>
+<tbody>
+<tr>
+<td style="text-align: left;">Med lokalrecidiv ZDW51G Tillægskode til
+diagnosekode</td>
+</tr>
+</tbody>
+</table>
+<hr /></td>
+</tr>
+</tbody>
+</table>
+<h3 id="section"></h3>
+<h3
+id="kontrolundersøgelse-fjernrecidiv-ingen-lokal-recidiv">Kontrolundersøgelse
+– Fjernrecidiv – ingen lokal recidiv</h3>
+<p>Metastaselokalisationer kodes iht. LPR vejledning. Kodes der ikke for
+lokalrecidiv tolkes dette som ikke værende tilstede.</p>
+<h3
+id="kontrolundersøgelse-fjernrecidiv-lokal-recidiv">Kontrolundersøgelse
+– Fjernrecidiv &amp; Lokal recidiv</h3>
+<table>
+<colgroup>
+<col style="width: 101%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table>
+<tbody>
+<tr>
+<td style="text-align: left;">Med lokalrecidiv ZDW51G Tillægskode til
+diagnosekode</td>
+</tr>
+</tbody>
+</table>
+<hr /></td>
+</tr>
+</tbody>
+</table>
+<p>Metastaselokalisationer kodes iht. LPR vejledning</p>
+<h3 id="fjernrecidiv-kodning-lpr-vejledning">Fjernrecidiv kodning
+(LPR-vejledning)</h3>
+<p>Ved systemisk recidiv kodes med recidivlokalisation fra organet som
+A-diagnose og med primær kolorektalcancer som bi-diagnose.</p>
+<p>Dato for denne kode er dato for recidiv.</p>
+<table>
+<colgroup>
+<col style="width: 101%" />
+</colgroup>
+<tbody>
+<tr>
+<td><table style="width:97%;">
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 20%" />
+<col style="width: 44%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: center;">Hyppige lokalisationer</th>
+<th style="text-align: center;">Diagnosekode</th>
+<th style="text-align: center;">Kommentar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">Lever</td>
+<td style="text-align: center;">DC78.7</td>
+<td style="text-align: center;">Fjernmetastase i lever</td>
+</tr>
+<tr>
+<td style="text-align: center;">Lunge</td>
+<td style="text-align: center;">DC78.0</td>
+<td style="text-align: center;">Fjernmetastase i lunge</td>
+</tr>
+<tr>
+<td style="text-align: center;">Peritoneum</td>
+<td style="text-align: center;">DC78.6D</td>
+<td style="text-align: center;">Carcinose i peritoneum</td>
+</tr>
+<tr>
+<td style="text-align: center;">Retroperitonum</td>
+<td style="text-align: center;">DC78.6C</td>
+<td style="text-align: center;">Metastase i retroperitoneal rum</td>
+</tr>
+<tr>
+<td style="text-align: center;">Knogle</td>
+<td style="text-align: center;">DC79.5B</td>
+<td style="text-align: center;">Fjernmetastase i knogle</td>
+</tr>
+<tr>
+<td style="text-align: center;">Metastase UNS</td>
+<td style="text-align: center;">DC79.8</td>
+<td style="text-align: center;"></td>
+</tr>
+</tbody>
+</table></td>
+</tr>
+</tbody>
+</table>
+<h3 id="manglende-kodning-af-recidiv-status">Manglende kodning af
+recidiv status</h3>
+<p>Der foretages aktiv kodning (kodning af recidiv ej fundet) for at
+etablere recidiv data. Aktiv kodning i denne henseende er at der
+påsættes kode for “uden recidiv” og dette ikke er implicit ved manglende
+kodning.</p>
+
+</section>
+<section id="onkologi-sec">
+<h1 id="onkologi">Onkologi</h1>
+<p>Patienter, der ses på en onkologisk afdeling uden at være set forud
+på en kirurgisk afdeling, skal have registreret basis værdier som
+beskrevet tidligere.</p>
+<h3 id="kodning-af-onkologisk-forløb">Kodning af onkologisk forløb</h3>
+<p>Patienter, der ses på en onkologisk afdeling, registreres med
+behandling intention og performance status ved hvert behandlingsskifte.
+I modsætning til kirurgiske procedure behøves disse koder ikke at blive
+påført ved hver procedure (medicingivning/strålebehandlingsfraktioner),
+men i starten af behandlingen. Dvs. at der ikke er krav om intention ved
+enkelte fraktioner eller serier.</p>
+<h3 id="performance-status">Performance Status</h3>
+<p>Se under basis skema for koder</p>
+<h3 id="lokalisations-angivelse-ved-stråleterapi">Lokalisations
+angivelse ved stråleterapi</h3>
+<p>Ved stråleterapi ønskes oplyst hvilket organ, behandling blev givet
+imod. I praksis vil det kun være rektumcancerpatienter hvor pallierende
+stråleterapi kan retters mod enten primær tumor eller metastaser.</p>
+<p>Hvis behandling kobles på metastase lokalisation som A-diagnose, er
+det ikke nødvendigt at angive yderligere. Hvis pallierende behandling
+rettes mod andet organ, ønskes oplyst anatomisk lokalisation
+sideløbende.</p>
+<h3
+id="proceduresigtebehandlingsintention">Proceduresigte/behandlingsintention</h3>
+<p>Proceduresigtet defineres ved onkologisk behandling som den intention
+behandlingen initialt bliver givet ved. Dette adskiller sig fra den
+kirurgiske definition.</p>
+<p>Intention kan ideelt tilføjes hver enkelt kemoterapi procedure,
+alternativt skal denne tilføjes ved start og ved skift i behandling. Kan
+tilføjes i forbindelse med journaloptagelses aktivitet etc.</p>
+<table style="width:99%;">
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 14%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Onkologisk
+behandlingsintention</strong></th>
+<th style="text-align: left;"><strong>Tillægskode til
+procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Adjuverende behandling</td>
+<td style="text-align: left;">ZPZA02A</td>
+<td style="text-align: left;">Behandling af patient med mulig
+mikroskopisk sygdom, forudgået af en kurativ procedure – resektion.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Neoadjuverende behandling</td>
+<td style="text-align: left;">ZPZA02B</td>
+<td style="text-align: left;">Behandling af resektabel sygdom, hvor
+resektion er mulig, men hvor patient kan have gavn af behandling forud
+for resektionsforsøg</td>
+</tr>
+<tr>
+<td style="text-align: left;">Intenderet kurativ behandling</td>
+<td style="text-align: left;">ZPZA02C</td>
+<td style="text-align: left;">Procedure der i sig selv kan opnå chance
+for helbredelse - uden anvendelse af ekstra modalitet (stråleterapi,
+onkologi etc) og tilstedeværelse af makroskopisk sygdom</td>
+</tr>
+<tr>
+<td style="text-align: left;">Downstaging</td>
+<td style="text-align: left;">ZPZA02E</td>
+<td style="text-align: left;">Behandling af non-resektabel sygdom, hvor
+skrumpning kan give mulighed for resektion</td>
+</tr>
+<tr>
+<td style="text-align: left;">Palliativ</td>
+<td style="text-align: left;">ZPZA05</td>
+<td style="text-align: left;">Behandling hvor det ikke anses sandsynlig
+(90%+) at der kan opnås anden intenderet kurativ behandling ved
+effekt</td>
+</tr>
+<tr>
+<td style="text-align: left;">Ingen behandling</td>
+<td style="text-align: left;">ZWCM8</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<h3 id="hjælpesektion-for-medicinsk-onkologi">Hjælpesektion for
+Medicinsk Onkologi</h3>
+<h4 id="antineoplastisk-behandling">Antineoplastisk behandling</h4>
+<p>Antineoplastisk behandling skal kodes så ensartet som muligt så
+behandlingsregimet fremstår.</p>
+<p>Behandling kodes med kombinationskoder hvis muligt. Ellers kodes de
+indgivne enkelte stoffer.</p>
+<p>Optræder det indgivne stof ikke i SKS, kodes enten simpel eller
+kompleks kemoterapi, med SKS ATC-koden (M***).</p>
+<p>Kombinationsbehandling</p>
+<table style="width:98%;">
+<colgroup>
+<col style="width: 55%" />
+<col style="width: 19%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Kombinations koder</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Behandling med
+capecitabin+oxaliplatin</td>
+<td style="text-align: left;">BWHA222</td>
+<td style="text-align: left;">CapOx</td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med
+5-fluorouracil+oxaliplatin</td>
+<td style="text-align: left;">BWHA231</td>
+<td style="text-align: left;">FOLFOX</td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med
+5-fluorouracil+irinotecan</td>
+<td style="text-align: left;">BWHA233</td>
+<td style="text-align: left;">FOLFIRI</td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med fluorouracil + irinotecan +
+oxaliplatin</td>
+<td style="text-align: left;">BWHA234</td>
+<td style="text-align: left;">FOLFOXIRI/FOLFIRINOX</td>
+</tr>
+</tbody>
+</table>
+<p>Enkeltstofbehandling</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 49%" />
+<col style="width: 26%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Enkelt stof koder</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Behandling med oxaliplatin</td>
+<td style="text-align: left;">BWHA108</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med 5-fluorouracil</td>
+<td style="text-align: left;">BWHA110</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med capecitabin</td>
+<td style="text-align: left;">BWHA123</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med irinotecan</td>
+<td style="text-align: left;">BWHA212</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med cetuximab</td>
+<td style="text-align: left;">BOHJ17</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med bevacizumab</td>
+<td style="text-align: left;">BOHJ19B1</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med panitumumab</td>
+<td style="text-align: left;">BOHJ19C2</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med encorafenib</td>
+<td style="text-align: left;">BWHA446</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med pembrolizumab</td>
+<td style="text-align: left;">BOHJ19J3</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med tegafur/uracil</td>
+<td style="text-align: left;">BWHA141</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>Behandling med Trifluridin ellerTegafur:</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 20%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Behandling med
+Trifluridin/Tegafur</strong></th>
+<th style="text-align: left;"><strong>ATC-kode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Trifluridin, kombinationer</td>
+<td style="text-align: left;">ML01BC59</td>
+<td style="text-align: left;">Lonsurf</td>
+</tr>
+<tr>
+<td style="text-align: left;">Tegafur, kombinationer</td>
+<td style="text-align: left;">ML01BC53</td>
+<td style="text-align: left;">S1</td>
+</tr>
+</tbody>
+</table>
+<h4 id="behandling-af-knoglemetastaser">Behandling af
+knoglemetastaser</h4>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 26%" />
+<col style="width: 21%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Behandling af
+knoglemetastaser</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+<th style="text-align: left;"><strong>Kommentar</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Behandling med bisfosfonat</td>
+<td style="text-align: left;">BWHB40</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med zoledronsyre</td>
+<td style="text-align: left;">BWHB40A</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med ibandronsyre</td>
+<td style="text-align: left;">BWHB40B</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med pamidronat</td>
+<td style="text-align: left;">BWHB40C</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">Behandling med denosumab</td>
+<td style="text-align: left;">BWHB42</td>
+<td style="text-align: left;"></td>
+</tr>
+</tbody>
+</table>
+<p>Hjælpesektion for radioterapi</p>
+<h3 id="hjælpe-sektion-til-strålebehandlingsprocedure">Hjælpe sektion
+til Strålebehandlingsprocedure</h3>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Strålingstype (ikke
+udtømmende)</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Konventionel ekstern strålebehandling</td>
+<td style="text-align: left;">BWGC1</td>
+</tr>
+<tr>
+<td style="text-align: left;">Intensitetsmoduleret radioterapi
+(IMRT)</td>
+<td style="text-align: left;">BWGC4</td>
+</tr>
+<tr>
+<td style="text-align: left;">Individuel konform strålebehandling</td>
+<td style="text-align: left;">BWGC</td>
+</tr>
+<tr>
+<td style="text-align: left;">MR-vejledt strålebehandling</td>
+<td style="text-align: left;">BWGC8</td>
+</tr>
+</tbody>
+</table>
+<p>Gives palliativ bestråling ønskes opgivet lokalisation, hvis denne
+ikke fremgår af den tilknyttede aktionsdiagnose.</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 56%" />
+<col style="width: 40%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Bestrålet
+lokalisation</strong></th>
+<th style="text-align: left;"><strong>Topografikode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Rektum</td>
+<td style="text-align: left;">T000751</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cerebrum</td>
+<td style="text-align: left;">T001076</td>
+</tr>
+<tr>
+<td style="text-align: left;">Lunge</td>
+<td style="text-align: left;">T000398</td>
+</tr>
+<tr>
+<td style="text-align: left;">Lever</td>
+<td style="text-align: left;">T000607</td>
+</tr>
+<tr>
+<td style="text-align: left;">Knogle</td>
+<td style="text-align: left;">T000224</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hud</td>
+<td style="text-align: left;">T000010</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ablativekurative-hypofraktioneret-behandling">Ablative/kurative
+hypofraktioneret behandling</h4>
+<p>Gives hypofraktioneret kurativt anlagt behandling
+tilføjes/anvendes</p>
+<table style="width:97%;">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 29%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;"><strong>Stereotaktisk
+strålebehandling</strong></th>
+<th style="text-align: left;"><strong>Procedurekode</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Stereotaktisk strålebehandling af
+lever</td>
+<td style="text-align: left;">BWGC22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stereotaktisk strålebehandling af
+lunger</td>
+<td style="text-align: left;">BWGC23</td>
+</tr>
+<tr>
+<td style="text-align: left;">Cerebral stereotaktisk
+strålebehandling</td>
+<td style="text-align: left;">BWGC21</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+</main>
+
+<script>
+const sb  = document.getElementById('sidebar');
+const ov  = document.getElementById('overlay');
+
+function openSb()  { sb.classList.add('open');  ov.classList.add('show'); }
+function closeSb() { sb.classList.remove('open'); ov.classList.remove('show'); }
+
+document.getElementById('hbtn').addEventListener('click', openSb);
+document.getElementById('sbclose').addEventListener('click', closeSb);
+ov.addEventListener('click', closeSb);
+
+// Close drawer on nav click (mobile)
+document.querySelectorAll('.nt, .ns').forEach(a =>
+  a.addEventListener('click', () => { if (window.innerWidth <= 860) closeSb(); })
+);
+
+// Expand/collapse sub-items when chapter title clicked
+document.querySelectorAll('.nt').forEach(a => {
+  a.addEventListener('click', e => {
+    const nc = a.closest('.nc');
+    const wasOpen = nc.classList.contains('open');
+    document.querySelectorAll('.nc.open').forEach(n => n.classList.remove('open'));
+    if (!wasOpen) nc.classList.add('open');
+  });
+});
+
+// Highlight active section while scrolling
+const allSections = document.querySelectorAll('section[id]');
+const allLinks    = document.querySelectorAll('#sb-nav a[href^="#"]');
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const id = entry.target.id;
+    allLinks.forEach(a => {
+      const on = a.getAttribute('href') === '#' + id;
+      a.classList.toggle('active', on);
+      if (on && a.classList.contains('nt')) {
+        a.closest('.nc').classList.add('open');
+      }
+    });
+  });
+}, { rootMargin: '-15% 0px -75% 0px' });
+
+allSections.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
