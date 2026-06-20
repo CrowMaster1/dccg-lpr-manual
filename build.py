@@ -42,57 +42,68 @@ def strip_wrapper_tables(html):
     )
 
 def inject_ids(html, used):
+    """Collect heading IDs (pandoc already adds them) and record for nav building."""
     headings = []
     def repl(m):
-        lvl, inner = m.group(1), m.group(2)
+        lvl, attrs, inner = m.group(1), m.group(2), m.group(3)
         text = re.sub(r'<[^>]+>', '', inner).strip()
-        base = slugify(text) or 'h'
-        n = used.get(base, 0)
-        used[base] = n + 1
-        hid = base if n == 0 else f'{base}-{n}'
+        # Reuse pandoc's id if present, else generate one
+        existing = re.search(r'id="([^"]+)"', attrs)
+        if existing:
+            hid = existing.group(1)
+        else:
+            base = slugify(text) or 'h'
+            n = used.get(base, 0); used[base] = n + 1
+            hid = base if n == 0 else f'{base}-{n}'
         headings.append((int(lvl), text, hid))
         return f'<h{lvl} id="{hid}">{inner}</h{lvl}>'
-    html = re.sub(r'<h([1-4])>(.*?)</h\1>', repl, html, flags=re.DOTALL)
+    html = re.sub(r'<h([1-4])([^>]*)>(.*?)</h\1>', repl, html, flags=re.DOTALL)
     return html, headings
 
 def build_nav_entry(title, sid, headings):
-    """Build nested nav: chapter → H2 → H3."""
-    h2_groups = []
+    """Build nested nav using whatever heading levels exist (H1 ignored, first sub-level → items, next → children)."""
+    # Skip H1 (chapter title) and empty headings
+    subs = [(lvl, txt, hid) for lvl, txt, hid in headings if lvl > 1 and txt.strip()]
+    if not subs:
+        return f'<div class="nc"><a href="#{sid}" class="nt">{title}</a></div>'
+
+    first_lvl  = min(lvl for lvl, _, _ in subs)
+    second_lvl = first_lvl + 1
+
+    groups = []
     cur = None
-    for lvl, txt, hid in headings:
-        if lvl == 2:
-            cur = {'txt': txt, 'id': hid, 'h3s': []}
-            h2_groups.append(cur)
-        elif lvl == 3 and cur is not None:
-            cur['h3s'].append((txt, hid))
+    for lvl, txt, hid in subs:
+        if lvl == first_lvl:
+            cur = {'txt': txt, 'id': hid, 'children': []}
+            groups.append(cur)
+        elif lvl == second_lvl and cur is not None:
+            cur['children'].append((txt, hid))
 
     inner = ''
-    for h2 in h2_groups:
-        if h2['h3s']:
-            h3_links = ''.join(
+    for g in groups:
+        if g['children']:
+            child_links = ''.join(
                 f'<a href="#{hid}" class="ns3">{txt}</a>'
-                for txt, hid in h2['h3s']
+                for txt, hid in g['children']
             )
             inner += (
                 f'<div class="nc2">'
-                f'<a href="#{h2["id"]}" class="ns2 has-children">{h2["txt"]}</a>'
-                f'<div class="nsub2">{h3_links}</div>'
+                f'<a href="#{g["id"]}" class="ns2 has-children">{g["txt"]}</a>'
+                f'<div class="nsub2">{child_links}</div>'
                 f'</div>'
             )
         else:
-            inner += f'<a href="#{h2["id"]}" class="ns2">{h2["txt"]}</a>'
+            inner += f'<a href="#{g["id"]}" class="ns2">{g["txt"]}</a>'
 
-    if inner:
-        return (
-            f'<div class="nc">'
-            f'<div class="nc-row">'
-            f'<a href="#{sid}" class="nt">{title}</a>'
-            f'<button class="nc-toggle" aria-label="Udvid">›</button>'
-            f'</div>'
-            f'<div class="nsub">{inner}</div>'
-            f'</div>'
-        )
-    return f'<div class="nc"><a href="#{sid}" class="nt">{title}</a></div>'
+    return (
+        f'<div class="nc">'
+        f'<div class="nc-row">'
+        f'<a href="#{sid}" class="nt">{title}</a>'
+        f'<button class="nc-toggle" aria-label="Udvid">›</button>'
+        f'</div>'
+        f'<div class="nsub">{inner}</div>'
+        f'</div>'
+    )
 
 # ── load and sort chapters ────────────────────────────────────────────────────
 
